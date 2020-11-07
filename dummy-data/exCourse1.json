@@ -1,0 +1,15 @@
+{
+    "schoolYear": 2020,
+    "term": 1,
+    "status": "active",
+    "codes": [],
+    "name": "Tests",
+    "teachers": ["5fa2fc410106773e84f00d73"],
+    "roster": [
+        {
+            "student_id": "5fa2fd0b0106773e84f00d77",
+            "code": "TTT41-4",
+            "status": "active"
+        }
+    ]
+}

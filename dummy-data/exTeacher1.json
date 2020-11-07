@@ -1,0 +1,16 @@
+[{
+    "status": "active",
+    "lName": "Teachington",
+    "fName": "Teach",
+    "doeEmail": "TTeachin45@schools.nyc.gov",
+    "phoneExt": "1111",
+    "activeCourses": []
+},
+{
+    "status": "active",
+    "lName": "Maestro",
+    "fName": "Mauricio",
+    "doeEmail": "MMaestro3@schools.nyc.gov",
+    "phoneExt": "5555",
+    "activeCourses": []
+}]

@@ -1,0 +1,19 @@
+{
+    "osis": 222333333,
+    "status": "active",
+    "lName": "McTest",
+    "fName": "Testetia",
+    "level": 9,
+    "doeEmail": "TEstesiam@nycstudents.net",
+    "contacts": ["5551234567"],
+    "relations": [
+        {
+            "lName": "unknown",
+            "fName": "unknown",
+            "relation": "unknown",
+            "contact": "mctest21@gmail.com"
+        }
+    ],
+    "activeCourses": [],
+    "attendancePct": 87
+}

@@ -1,0 +1,25 @@
+{
+    "osis": 2222222,
+    "status": "active",
+    "lName": "Testerson",
+    "fName": "Test",
+    "level": 12,
+    "doeEmail": "TEsttes37@nycstudents.net",
+    "contacts": ["5555555555"],
+    "relations": [
+        {
+            "lName": "unknown",
+            "fName": "unknown",
+            "relation": "unknown",
+            "contact": "testerson@gmail.com"
+        },
+        {
+            "lName": "Testerson",
+            "fName": "Testward",
+            "relation": "father",
+            "contact": "5551234567"
+        }
+    ],
+    "activeCourses": [],
+    "attendancePct": 92
+}

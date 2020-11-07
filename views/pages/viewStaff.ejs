@@ -1,0 +1,15 @@
+<html>
+    <head>
+        <%- include('../partials/head') %>
+    </head>
+
+    <body>
+        <h1> Current staff </h1>
+        <% for(let staff of data) { %>
+            <article>
+                <h2><%= `${staff.lName}, ${staff.fName}` %></h2>
+                <p><%= `Status: ${staff.status}` %></p>
+            </article>
+        <% } %>
+    </body>
+</html>

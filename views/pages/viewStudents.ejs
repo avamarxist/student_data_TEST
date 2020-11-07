@@ -1,0 +1,15 @@
+<html>
+    <head>
+        <%- include('../partials/head') %>
+    </head>
+
+    <body>
+        <h1> Current students </h1>
+        <% for(let student of data) { %>
+            <article>
+                <h2><%= `${student.lName}, ${student.fName}` %></h2>
+                <p><%= `OSIS: ${student.osis}` %></p>
+            </article>
+        <% } %>
+    </body>
+</html>

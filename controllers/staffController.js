@@ -5,14 +5,16 @@ const Staff = require('../mongo-schema/staffSchema');
 exports.staff_list = (req, res)=>{
     console.log("Triggered function staff_list");;
 
-    Staff.find({}, (err, results)=>{
-        if(err){
-            console.log(results);
-        } else{
-            console.log(results);
-            res.render('pages/viewStaff', {data: results});
-        }
-    });
+    Staff.find({})
+        .populate('courses')
+        .exec((err, results)=>{
+            if(err){
+                console.log(results);
+            } else{
+                console.log(results);
+                res.render('pages/viewStaff', {data: results});
+            }
+        });
 };
 
 exports.staff_detail = (req,res)=>{
@@ -45,7 +47,7 @@ exports.staff_addNew = (req, res)=>{
             console.log(err);
         } else{
             console.log(result);
-            res.json(result);
+            res.redirect('/catalog/staff/view');
         }
     })
 };

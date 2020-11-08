@@ -1,0 +1,86 @@
+<html>
+    <head>
+        <%- include('../partials/head')%>
+    </head>
+
+    <body>
+        <h1>Add new course </h1>
+
+        <form method="POST" action="/catalog/course/add" enctype="text/html" id="mainForm">
+
+            <div class="form-row">
+                <div class="form-group col-xs-2">
+                    <label for="status">Status</label>
+                    <select name="status" class="form-control" id="status">
+                        <option value="active">Active</option>
+                        <option value="closed">Closed</option>
+                    </select>
+                </div>
+                <div class = "form-group col-xs-2">
+                    <label for="year">School Year</label>
+                    <select name="schoolYear" class="form-control" id="year">
+                        <% const today = new Date(); const currYear=today.getFullYear(); %>
+                        <% for(let y=currYear-2; y<=currYear+5; y++ ){ %>
+                            <option value="<%= y %>"><%= `${y}`%></option>
+                        <% } %>
+                    </select>
+                </div>
+                <div class = "form-group col-xs-2">
+                    <label for="term">Term</label>
+                    <select name="term" class="form-control" id="term">
+                        <% for(let t=1; t<=7; t++ ){ %>
+                            <option value="<%= t %>"><%= `${t}`%></option>
+                        <% } %>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group row">
+
+                <div class="col-xs-3">
+                    <label for="name">Course name</label>
+                    <input name="name" type="text" class="form-control" id="name">
+                </div>
+                <div class = "form-group col-xs-2">
+                    <label for="period">Period</label>
+                    <select name="period" class="form-control" id="period">
+                        <% for(let t=1; t<=8; t++ ){ %>
+                            <option value="<%= t %>"><%= `${t}`%></option>
+                        <% } %>
+                    </select>
+                </div>
+            
+            </div>
+
+            <div class="form-check" >
+                <div>
+                    <button type="button" class="btn btn-info" data-toggle="collapse" data-target="#staffList">Click to add associated teachers/staff</button>
+                </div>
+                <div id="staffList" class="collapse">
+                    <% for(let member of data.activeStaff) { %>
+                        <div>
+                            <input name="staff" class="form-check-input" id="<%= member._id %>" type="checkbox" value="<%= member._id %>">
+                            <label class="form-check-label" for="<%= member._id %>"><%= `${member.lName}, ${member.fName}` %></label>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+
+            <div class="form-group row">
+                <select type=text name="numStudents" class="form-control" id="numStudents">
+                    <% for(let i=0; i<50; i++){ %>
+                        <option value="<%= i %>"><%= i %></option>
+                    <% } %>
+                </select>
+            </div>
+
+            
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary" >Submit</button>
+            </div>
+        
+        </form>
+
+    </body>
+</html>

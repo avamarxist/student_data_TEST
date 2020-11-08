@@ -1,0 +1,33 @@
+<html>
+    <head>
+        <%- include('../partials/head') %>
+    </head>
+
+    <body>
+
+        <h2>Add students to roster</h2>
+
+        <form method='POST' action="<%- '/catalog/course/add/roster/' + data.id %>">
+            <% for(let i=0; i < data.num; i++){ %>
+                <div class="form-group row" id="<%= 'student'+i %>">
+                    <div class="form-group col-xs-2">
+                        <input type="text" class="form-control" name="<%= 'student'+i %>" id="studentCode" placeholder="Course code">
+                    </div>
+                    <div class="form-group col-xs-6">
+                        <select class="form-control col-xs-4" id="studentName" name="<%= 'student'+i %>">
+                            <% for(let member of data.activeStudents){ %>
+                                <option value="<%= member._id %>"><%= `${member.osis} ${member.lName}, ${member.fName}` %></option>
+                            <% } %>
+                        </select>
+                    </div>
+                </div>
+            <% } %>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary" >Submit</button>
+            </div>
+        </form>
+        
+    
+    </body>
+
+</html>

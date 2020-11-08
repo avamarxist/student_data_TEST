@@ -9,6 +9,10 @@
             <article>
                 <h2><%= `${staff.lName}, ${staff.fName}` %></h2>
                 <p><%= `Status: ${staff.status}` %></p>
+                <% for(let course of staff.courses) { %>
+                    <p><%= `${course.name}` %></p>
+                    <p><%= `${course.name}` %></p>
+                <% } %>
             </article>
         <% } %>
     </body>

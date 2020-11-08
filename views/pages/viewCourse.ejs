@@ -1,0 +1,20 @@
+<html>
+    <head>
+        <%- include('../partials/head') %>
+    </head>
+
+    <body>
+        <h1> Current staff </h1>
+        <% for(let course of data) { %>
+            <article>
+                <h2><%= `${course.name}   Pd. ${course.period}` %></h2>
+                <p><%= `Status: ${course.status}     Year: ${course.schoolYear}     Term: ${course.term}` %></p>
+                <p>Teacher(s): 
+                    <% course.staff.forEach((s)=>{ %>
+                        <%- `${s.toJSON().lName}, ${s.toJSON().fName}; ` %>
+                    <% }) %>
+                </p>
+            </article>
+        <% } %>
+    </body>
+</html>

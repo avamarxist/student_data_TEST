@@ -10,12 +10,13 @@ const courseSchema = new Schema({
     status: {type: String, default: "active"},
     codes: [{type: String}],
     name: {type: String},
-    staff: [{type: Schema.Types.ObjectId, ref: Staff}],
-    roster: [{
-        student_id: {type: Schema.Types.ObjectId, ref: Student}, 
+    period: {type: Number, min: 1, max: 7},
+    staff: [{type: Schema.Types.ObjectId, ref: 'Staff' }],
+    students: [{
+        student_id: {type: Schema.Types.ObjectId, ref: 'Student'}, 
         code: {type: String}, 
         status: {type: String, default: "active"}
     }]
 }, {timestamps: true, strict: "throw"});
 
-module.exports = mongoose.model('course', courseSchema);
+module.exports = mongoose.model('Course', courseSchema);

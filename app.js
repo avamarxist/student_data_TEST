@@ -14,7 +14,7 @@ app.use(upload.array());
 // app.set('views', path.join(__dirname, './views/'));
 app.set('view engine', 'ejs');
 
-const db = require("./db");
+// const db = require("./db");
 const catalog = require("./routes/catalog");
 const entries = require("./routes/entries");
 
@@ -24,12 +24,14 @@ app.use('/entries', entries);
 
 
 const mongoose = require('mongoose');
-const PORT = 3000;
-const dbname = "student_data_TEST";
-const url = "mongodb://localhost:27017";
-const mongoOptions = {useNewUrlParser: true, useUnifiedTopology: true};
+const PORT = process.env.PORT || 3000;
+const url = "mongodb+srv://" + process.env.DB_HOST + process.env.DB_PORT + process.env.DB_NAME + process.env.DB_QUERY;
+console.log(url);
+// const pass = process.env.DB_PWD;
+// console.log (`Pass: ${pass}  type: ${typeof(pass)}`);
+const mongoOptions = {user: process.env.DB_USER, pass: process.env.DB_PWD, useNewUrlParser: true, useUnifiedTopology: true};
 
-mongoose.connect(url+'/'+dbname, mongoOptions, (err, client)=>{
+mongoose.connect(url, mongoOptions, (err, client)=>{
     if(err){
         console.log(err);
         process.exit(1);

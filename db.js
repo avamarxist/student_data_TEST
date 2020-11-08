@@ -1,13 +1,28 @@
 const mongoose = require('mongoose');
+const tunnel = require('tunnel-ssh');
 
-const dbname = "student_data_TEST";
-const url = "mongodb://localhost:27017";
-const mongoOptions = {useNewUrlParser: true, useUnifiedTopology: true};
+// var config = {
+//     username: process.env.SSH_USER,
+//     host: process.env.SSH_HOST,
 
-const connect = mongoose.connect(url+'/'+dbname, mongoOptions);
+//     dstHost: process.env.DB_HOST,
+//     dstPort: process.env.DB_PORT,
+//     password:'mypassword',
+// };
 
-const db = mongoose.connection;
+var server = tunnel(config, function (error, server) {
+    if(error){
+        console.log("SSH connection error: " + error);
+    }
+    mongoose.connect('mongodb://localhost:27000/mydbname');
 
-const getDB = ()=>{ return state.db; };
+    var db = mongoose.connection;
+    db.on('error', console.error.bind(console, 'DB connection error:'));
+    db.once('open', function() {
+        // we're connected!
+        console.log("DB connection successful");
+        // console.log(server);
+    });
+});
 
 module.exports = {connect, getDB};

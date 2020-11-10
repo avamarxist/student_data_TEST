@@ -8,9 +8,13 @@ const commentController = require('../controllers/commentController');
 
 router.get('/comment/list', commentController.comment_list);
 
+router.post('/comment/list', commentController.comment_list);
+
 router.get('/comment/calendar', commentController.comment_calendar);
 
-router.post('/comment/add', commentController.comment_addNew);
+router.get('/comment/add', commentController.comment_addNew_get);
+
+router.post('/comment/add', commentController.comment_addNew_post);
 
 // ATTENDANCE ROUTES
 

@@ -1,6 +1,9 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
+const Course = require('../mongo-schema/courseSchema');
+const Comment = require('../mongo-schema/commentSchema');
+
 const studentSchema = new Schema({
     osis: {type: Number},
     status: {
@@ -14,8 +17,8 @@ const studentSchema = new Schema({
     doeEmail: {type: String},
     contacts: [{type: String}],
     relations: [{lName: {type: String}, fName: {type: String}, relation: {type: String}, contact: {type: String}}],
-    courses: [{type: Schema.Types.ObjectId}],
-    comments: [{type: Schema.Types.ObjectId}],
+    courses: [{type: Schema.Types.ObjectId, ref: 'Course'}],
+    comments: [{type: Schema.Types.ObjectId, ref: 'Comment'}],
     attendancePct: {type: Number}
 }, {timestamps: true, strict: "throw"});
 

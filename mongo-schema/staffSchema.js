@@ -1,7 +1,8 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-const Course = require('../mongo-schema/courseSchema')
+const Course = require('../mongo-schema/courseSchema');
+const Comment = require('../mongo-schema/commentSchema');
 
 const staffSchema = new Schema({
     status: {
@@ -13,7 +14,8 @@ const staffSchema = new Schema({
     fName: {type: String},
     doeEmail: {type: String},
     phoneExt: {type: String},
-    courses: [{type: Schema.Types.ObjectId, ref: Course}],
+    courses: [{type: Schema.Types.ObjectId, ref: 'Course'}],
+    comments: [{type: Schema.Types.ObjectId, ref: 'Comment'}]
 }, {collection: "staff", timestamps: true, strict: "throw"})
 
 module.exports = mongoose.model('Staff', staffSchema);

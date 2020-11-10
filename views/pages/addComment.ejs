@@ -1,0 +1,41 @@
+<html>
+    <head>
+        <%- include('../partials/head')%>
+    </head>
+
+    <body>
+        <h1>Add new comment </h1>
+
+        <form method="POST" action="/entries/comment/add" enctype="text/html" id="mainForm">
+
+            <div class="form-group row">
+                <select name="staff" class="form-control" id="staff">
+                    <% for(let staff of data.activeStaff){ %>
+                        <option value="<%= staff._id %>"><%= `${staff.lName}, ${staff.fName}` %></option>
+                    <% } %>
+                </select>
+            </div>
+
+            <div class="form-group row">
+                <select name="student" class="form-control" id="student">
+                    <% for(let student of data.activeStudents){ %>
+                        <option value="<%= student._id %>"><%= `${student.lName}, ${student.fName}` %></option>
+                    <% } %>
+                </select>
+            </div>
+
+            <div class="form-group" col-s-6>
+                <label for="note">Enter comment</label>
+                <input type="text" class="form-control" id="note" name="note">
+            </div>
+
+            
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary" >Submit</button>
+            </div>
+        
+        </form>
+
+    </body>
+</html>

@@ -17,11 +17,13 @@ app.set('view engine', 'ejs');
 // const db = require("./db");
 const catalog = require("./routes/catalog");
 const entries = require("./routes/entries");
+const importExport = require("./routes/import_export");
 
 app.use('/catalog', catalog);
 
 app.use('/entries', entries);
 
+app.use('/sheets', importExport);
 
 const mongoose = require('mongoose');
 const PORT = process.env.PORT || 3000;

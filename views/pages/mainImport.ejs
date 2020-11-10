@@ -1,0 +1,27 @@
+<html>
+    <head>
+        <%- include('../partials/head') %>
+    </head>
+
+    <body>
+        <h1>Choose data import template option and upload file</h1>
+
+        <form method="POST" action="import">
+
+            <div class = "form-group">
+                <label for="templateType">Select the type of spreadsheet you are uploading</label>
+                <select name="templateType" class="form-control" id="templateType">
+                    <option value="studentInfo">Student information sheet</option>
+                    <option value="staffInfo">Staff information sheet</option>
+                    <option value="courseProgram">Course program</option>
+                    <option value="courseRoster">Main roster</option>
+                </select>
+                <label for="fileUpload">Select CSV file to upload, then hit submit</label>
+                <input type="file" class="form-control-file" name="fileUpload" id="fileUpload">
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary" >Submit</button>
+            </div>
+        </form>
+    </body>
+</html>

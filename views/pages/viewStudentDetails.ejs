@@ -1,0 +1,49 @@
+<html>
+    <head>
+        <%- include('../partials/head') %>
+    </head>
+
+    <body>
+        <h1> Student Details </h1>
+
+        <form method="POST">
+            <div class="form-group row">
+                <select name="student" class="form-control" id="student">
+                    <option value="">No student selected</option>
+                    <% for(let student of data.activeStudents){ %>
+                        <option value="<%= student._id %>"><%= `${student.lName}, ${student.fName}` %></option>
+                    <% } %>
+                </select>
+            </div>
+            <select name="staff" class="form-control" id="staff">
+                    <option value="">No staff selected</option>
+                    <% for(let staff of data.activeStaff){ %>
+                        <option value="<%= staff._id %>"><%= `${staff.lName}, ${staff.fName}` %></option>
+                    <% } %>
+                </select>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary" >Refine list</button>
+            </div>
+        </form>
+
+        <% for(let comment of data.data) { %>
+            <article>
+                <p>
+                    <b> Staff: </b>
+                    <% for(let staff of comment.staff){ %>
+                        <%- `${staff.lName}, ${staff.fName}; ` %>
+                    <% } %>
+                    <br>
+                    <b>Students:</b>
+                    <% for(let student of comment.student){ %>
+                        <%- `${student.lName}, ${student.fName}; ` %>
+                    <% } %>
+                    <br>
+                    <i><%= comment.createdAt %></i>
+                </p>
+                <p><%= comment.note %></p>
+            </article>
+        <% } %>
+    </body>
+</html>

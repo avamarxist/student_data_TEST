@@ -27,6 +27,21 @@ const upload = multer();
 app.use(upload.array()); 
 app.use(passport.initialize());
 app.use(passport.session());
+// const upload = multer();
+// app.use(upload.array()); 
+
+// const formidable = require('express-formidable');
+// app.use(formidable({
+//     uploadDir: './uploads',
+//     multiples: true
+// }))
+
+app.use(function (err, req, res, next) {
+    console.log('This is the invalid field ->', err.field)
+    next(err)
+  })
+
+// app.set('views', path.join(__dirname, './views/'));
 app.set('view engine', 'ejs');
 
 // set up primary routes

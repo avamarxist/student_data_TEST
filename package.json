@@ -16,6 +16,8 @@
     "cookie-session": "^1.4.0",
     "ejs": "^3.1.5",
     "express": "^4.17.1",
+    "express-fileupload": "^1.2.0",
+    "express-formidable": "^1.2.0",
     "fast-csv": "^4.3.5",
     "helmet": "^4.2.0",
     "https": "^1.0.0",

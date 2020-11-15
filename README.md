@@ -12,17 +12,17 @@
     [ ] Edit individual teacher info
     [ ] Update individual courses
         [ ] Update basic info
-        [ ] Update roster
-    [ ] Batch add students via spreadsheet
-    [ ] Batch add staff from spreadsheet
+        [x] Update roster
+    [x] Batch add students via spreadsheet
+    [x] Batch add staff from spreadsheet
     [ ] Batch add courses from school program
     [ ] Batch add students to course rosters from STARS master roster
 
 [ ] Basic entry elements
-    [ ] Add individual comment entries
+    [x] Add individual comment entries
     [ ] View comments
-        [ ] By student
-        [ ] By staff
+        [x] By student
+        [x] By staff
         [ ] Calendar view
     [ ] Customized attendance form by date/class
     [ ] View attendance

@@ -12,7 +12,8 @@ const staffSchema = new Schema({
     },
     lName: {type: String},
     fName: {type: String},
-    doeEmail: {type: String},
+    organization: {type: String},
+    mainEmail: {type: String},
     phoneExt: {type: String},
     courses: [{type: Schema.Types.ObjectId, ref: 'Course'}],
     comments: [{type: Schema.Types.ObjectId, ref: 'Comment'}]

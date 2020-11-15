@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const multer = require('multer');
+// const multer = require('multer');
 const app = express();
 const httpsServer = require('https');
 const path = require('path');
@@ -8,8 +8,19 @@ require('dotenv').config();
 
 app.use(bodyParser.json());
 app.use(express.urlencoded({ extended: false }))
-const upload = multer();
-app.use(upload.array()); 
+// const upload = multer();
+// app.use(upload.array()); 
+
+// const formidable = require('express-formidable');
+// app.use(formidable({
+//     uploadDir: './uploads',
+//     multiples: true
+// }))
+
+app.use(function (err, req, res, next) {
+    console.log('This is the invalid field ->', err.field)
+    next(err)
+  })
 
 // app.set('views', path.join(__dirname, './views/'));
 app.set('view engine', 'ejs');

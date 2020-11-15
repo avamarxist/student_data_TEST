@@ -19,6 +19,8 @@ const studentSchema = new Schema({
     relations: [{lName: {type: String}, fName: {type: String}, relation: {type: String}, contact: {type: String}}],
     courses: [{type: Schema.Types.ObjectId, ref: 'Course'}],
     comments: [{type: Schema.Types.ObjectId, ref: 'Comment'}],
+    gradCohort: {type: String, enum: ["U", "V", "W", "X"]},
+    learningCohort: {type: String, enum: ["Remote", "Hybrid A", "Hybrid B"]},
     attendancePct: {type: Number}
 }, {timestamps: true, strict: "throw"});
 

@@ -7,10 +7,8 @@ const Student = require('../mongo-schema/studentSchema');
 exports.comment_list = (req, res)=>{
     console.log("Triggered function comment_list");
 
-    
-
-    console.log("req.body");
-    console.log(req.body);
+    // console.log("req.body");
+    // console.log(req.body);
 
     let student = req.body.student;
     let staff = req.body.staff;
@@ -25,8 +23,8 @@ exports.comment_list = (req, res)=>{
     if(fromDate){ query["createdAt"] = {$gte: fromDate} }
     if(toDate){ query["createdAt"] = {$lte: toDate}}
 
-    console.log("Query");
-    console.log(query);
+    // console.log("Query");
+    // console.log(query);
 
     const search = async() => {
         let [data, activeStaff, activeStudents] = await Promise.all([Comment.find(query).populate('student', 'osis lName fName').populate('staff', 'lName fName'), Staff.find({status:"active"}, '_id lName fName'), Student.find({status:"active"}, '_id osis lName fName')]);
@@ -36,30 +34,6 @@ exports.comment_list = (req, res)=>{
     search().then((results)=>{
         res.render('pages/viewComment', {data:results});
     });
-
-    // Comment.find(query).populate('student', 'osis lName fName').populate('staff', 'lName fName').exec((err, result)=>{
-    //     if(err){ console.log(err) }
-    //     else{ 
-
-    //         let dataObj = result;
-
-    //         // let actives = {};
-
-    //         const searchables = async ()=>{
-    //             let [activeStaff, activeStudents] = await Promise.all([Staff.find({status:"active"}, '_id lName fName'), Student.find({status:"active"}, '_id osis lName fName')]);
-    //             return {activeStaff, activeStudents};
-    //         }
-
-    //         searchables().then((results)=>{
-    //             actives = results;
-    //         });
-
-
-    //         console.log("Query results");
-    //         console.log(dataObj);
-    //         console.log("Searchables");
-    //         console.log(actives);
-    // });
 }
 
 

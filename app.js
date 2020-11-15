@@ -1,29 +1,49 @@
 const express = require('express');
-const bodyParser = require('body-parser');
+const session = require('cookie-session');
+const helmet = require('helmet');
 const multer = require('multer');
-const app = express();
-const httpsServer = require('https');
-const path = require('path');
-require('dotenv').config();
+const passport = require('passport');
+require('./passport');
+// const bodyParser = require('body-parser');
+// const httpsServer = require('https');
+// const path = require('path');
 
-app.use(bodyParser.json());
+const app = express();
+
+app.use(session({
+  name: 'session',
+  keys: ['key1', 'key2'],
+  cookie: {
+    secure: true,
+    httpOnly: true,
+    maxAge: 2*60*60*1000
+  }
+}));
+
+app.use(express.json());
 app.use(express.urlencoded({ extended: false }))
+app.use(helmet());
 const upload = multer();
 app.use(upload.array()); 
-
-// app.set('views', path.join(__dirname, './views/'));
+app.use(passport.initialize());
+app.use(passport.session());
 app.set('view engine', 'ejs');
 
-// const db = require("./db");
+// set up primary routes
+
+const auth = require('./routes/auth');
 const catalog = require("./routes/catalog");
 const entries = require("./routes/entries");
 const importExport = require("./routes/import_export");
+const home = require('./routes/home');
 
+app.use('/auth', auth);
 app.use('/catalog', catalog);
-
 app.use('/entries', entries);
-
 app.use('/sheets', importExport);
+app.use('/', home);
+
+// connect to DB and start server
 
 const mongoose = require('mongoose');
 const PORT = process.env.PORT || 3000;

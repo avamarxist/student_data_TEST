@@ -1,0 +1,57 @@
+<html>
+    <head>
+        <%- include('../partials/head') %>
+    </head>
+    <body>
+        <%- include('../partials/dashboard') %>
+
+        <form method="GET" action="/entries/attendance/add">
+            <div class="form-group row">
+                <div class="form-group col-xs-5">
+                    <label for="date">Date: </label>
+                    <input type="date" class="form-control" id="dateSelect" name="date">
+                </div>
+                <div class="form-group col-xs-6">
+                    <label for="course">Select course</label>
+                    <select class="form-control" id="courseSelect" name="course">
+                        <% for(let c of courseList){ %>
+                            <option value="<%- c._id %>"><%= `Pd. ${c.period} - ${c.code}` %></option>
+                        <% } %>
+                    </select>
+                </div> 
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary" >Generate attendance sheet</button>
+            </div>
+        </form>
+        <form method = POST action="/entries/attendance/add">
+            <input type="hidden" id="courseValue" name = "course" value="<%- queries.course %>">
+            <input type="hidden" id="dateValue" name = "date" value="<%- queries.date %>">            
+            <% if(students){ %>
+                <% for(let student of students){ %>
+                    <% let s = student.student_id %>
+                    <div class="form-row">
+                        <div class="col-xs-6">
+                            <%- `${s.lName}, ${s.fName}` %>
+                        </div>
+                    
+                        <div class="form-group col-xs-6">
+                            <select class="form-control" id="<%- s._id %>" name="<%- s._id %>">
+                                <option value=""> </option>
+                                <option value="p">Present (remote)</option>
+                                <option value="b">Present (hybrid)</option>
+                                <option value="a">Absent (unexcused)</option>
+                                <option value="e">Absent (excused)</option>
+                                <option value="l">Late</option>
+                            </select>
+                        </div>
+                    </div>
+                <% } %>
+            <% } %>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary" >Submit attendance</button>
+            </div>
+        </form>
+        
+    </body>
+</html>

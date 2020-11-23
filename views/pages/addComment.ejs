@@ -4,6 +4,7 @@
     </head>
 
     <body>
+        <%- include('../partials/dashboard') %>
         <h1>Add new comment </h1>
 
         <form method="POST" action="/entries/comment/add" enctype="text/html" id="mainForm">
@@ -22,6 +23,14 @@
                         <option value="<%= student._id %>"><%= `${student.lName}, ${student.fName}` %></option>
                     <% } %>
                 </select>
+            </div>
+
+            <% let now = new Date(); %>
+            <div class="form-group row">
+                <label for="date">(OPTIONAL) Date for back-dated comment</label>
+                <input type="date" class="form-control col-xs-4" id="date" name="date">
+                <!-- <label for="time">(OPTIONAL) Time</label>
+                <input type="time" class="form-control col-xs-4" id="time" name="time"> -->
             </div>
 
             <div class="form-group" col-s-6>

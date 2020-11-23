@@ -4,12 +4,14 @@
     </head>
 
     <body>
+        <%- include('../partials/dashboard') %>
         <h1> Current students </h1>
         <% for(let student of data) { %>
             <article>
-                <h2><%= `${student.lName}, ${student.fName}` %></h2>
+                <h2><a href='<%- `/records/student/view/${student._id}`%>'><%= `${student.lName}, ${student.fName}` %></a></h2>
                 <p><%= `OSIS: ${student.osis}` %></p>
             </article>
         <% } %>
+        <%- include('../partials/tail') %>
     </body>
 </html>

@@ -9,6 +9,7 @@ const studentSchema = new Schema({
     status: {
         type: String,
         default: "active",
+        lowercase: true,
         enum: ["active", "withdrawn", "graduated"]
     },
     lName: {type: String},
@@ -16,8 +17,16 @@ const studentSchema = new Schema({
     level: {type: Number},
     doeEmail: {type: String},
     contacts: [{type: String}],
-    relations: [{lName: {type: String}, fName: {type: String}, relation: {type: String}, contact: {type: String}}],
-    courses: [{type: Schema.Types.ObjectId, ref: 'Course'}],
+    relations: [{
+        lName: {type: String}, 
+        fName: {type: String}, 
+        relation: {type: String}, 
+        contact: {type: String}
+    }],
+    courses: [{
+        courseId: {type: Schema.Types.ObjectId, ref: 'Course'},
+        status: {type: String, lowercase: true, enum: ["active", "removed", "completed", "incomplete"]}
+    }],
     comments: [{type: Schema.Types.ObjectId, ref: 'Comment'}],
     gradCohort: {type: String, enum: ["U", "V", "W", "X"]},
     learningCohort: {type: String, enum: ["Remote", "Hybrid A", "Hybrid B"]},

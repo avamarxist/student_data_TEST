@@ -4,7 +4,7 @@ const Comment = require('../mongo-schema/commentSchema');
 const Staff = require('../mongo-schema/staffSchema');
 const Student = require('../mongo-schema/studentSchema');
 
-exports.comment_list = (req, res)=>{
+exports.comment_list = async (req, res)=>{
     console.log("Triggered function comment_list");
 
     // console.log("req.body");
@@ -23,17 +23,13 @@ exports.comment_list = (req, res)=>{
     if(fromDate){ query["createdAt"] = {$gte: fromDate} }
     if(toDate){ query["createdAt"] = {$lte: toDate}}
 
-    // console.log("Query");
-    // console.log(query);
+    let data = await Comment.find(query).populate('student', 'osis lName fName').populate('staff', 'lName fName'); 
+    let activeStaff = req.session.activeStaff ? req.session.activeStaff : await Staff.find({}, '_id lName fName');
+    let activeStudents = req.session.activeStudents ? req.session.activeStudents : await Student.find({status:"active"}, '_id osis lName fName');
 
-    const search = async() => {
-        let [data, activeStaff, activeStudents] = await Promise.all([Comment.find(query).populate('student', 'osis lName fName').populate('staff', 'lName fName'), Staff.find({status:"active"}, '_id lName fName'), Student.find({status:"active"}, '_id osis lName fName')]);
-        return {data, activeStaff, activeStudents};
-    }
 
-    search().then((results)=>{
-        res.render('pages/viewComment', {data:results});
-    });
+    let results = {data, activeStaff, activeStudents};
+    res.render('pages/viewComment', {data:results});
 }
 
 
@@ -55,7 +51,10 @@ exports.comment_addNew_get = (req, res)=>{
     console.log("Triggered function comment_addNew_get");
 
     const queries = async ()=>{
-        let [activeStaff, activeStudents] = await Promise.all([Staff.find({status:"active"}, '_id lName fName'), Student.find({status:"active"}, '_id osis lName fName')]);
+        let [activeStaff, activeStudents] = await Promise.all([
+            Staff.find({status:"active"}, '_id lName fName').sort({lName: 'ascending'}), 
+            Student.find({status:"active"}, '_id osis lName fName').sort({lName: 'ascending'})
+        ]);
         return {activeStaff, activeStudents};
     }
 
@@ -71,8 +70,12 @@ exports.comment_addNew_post = (req, res)=>{
     console.log("Triggered function comment_addNew");
 
     const userInput = req.body;
-    console.log(userInput);
 
+    userInput['commentDateTime'] = new Date(userInput.date);
+    delete userInput.date;
+
+
+    console.log(userInput);
 
     const newComment = new Comment(userInput);
 
@@ -81,13 +84,9 @@ exports.comment_addNew_post = (req, res)=>{
     Student.findByIdAndUpdate(userInput.student, {$addToSet: {comments: newComment.id}}, {upsert: true}, genericCb);
     
     newComment.save((err, result)=>{
-        if(err){
-            console.log(err);
-        } else{
-            console.log(result);
-            res.json(result);
-        }
-    })
+        if(err){console.log(err)}
+        else{res.json(result)}
+    });
 };
 
 exports.comment_update = (req,res)=>{

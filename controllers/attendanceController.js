@@ -1,6 +1,10 @@
-const Attendance = require('../mongo-schema/attendanceSchema');
+const {genericCb} = require('../helpers');
 
-exports.student_attendance_full = (req, res)=>{
+const Attendance = require('../mongo-schema/attendanceSchema');
+const Course = require('../mongo-schema/courseSchema');
+const Staff = require('../mongo-schema/staffSchema');
+
+exports.student_full = (req, res)=>{
     console.log("Triggered function students_list");
 
     Student.find({}, (err, docs)=>{
@@ -13,7 +17,7 @@ exports.student_attendance_full = (req, res)=>{
     });
 };
 
-exports.class_attendance_full = (req,res)=>{
+exports.class_full = (req,res)=>{
     console.log("Triggered function students_detail");
     let studentID = req.params.id;
     console.log(`student id: ${studentID}`);
@@ -38,22 +42,77 @@ exports.student_class_attendance = (req, res)=>{
 // Add a new comment entry
 // TO ADD -
 
-exports.attendance_addNew = (req, res)=>{
+exports.get_addNew = async (req, res)=>{
+    if(!req.user){ res.redirect('/auth/login'); }
+    console.log("Triggered get_addNew");
+    
+    // // if(!req.user.role.includes("teacher")){
+    // //     res.send('You must be a teacher to add attendance');
+    // //     return;
+    // // }
+
+    let course = req.query.course;
+    
+    let fromDate = req.query.fromDate;
+    let toDate = req.query.toDate;
+
+    // if(course){ query[""] = student }
+    // if(staff){ query["staff"] = staff }
+
+
+    let activeCourses = await Staff.findById(req.user.staff_id)
+        .select('courses')
+        .populate({
+            path: 'courses', 
+            select: '_id code courseName classAlias section period', 
+            match: {status: "active"}
+        });
+    let sortedCourses = activeCourses.courses.sort((a,b)=>{
+        if(a.period > b.period) { return 1 }
+        else if (a.period == b.period) {
+            if(a.code > b.code) { return 1 }
+            else { return -1 }
+        } else { return -1 }
+    });
+    let activeStaff = req.session.activeStaff ? req.session.activeStaff : await Staff.find({}, '_id lName fName');
+    
+    let query = {};
+    if(req.query.course){
+        query["_id"] = req.query.course;
+    }
+
+    const roster = req.query.course ? await Course.findOne(query, 'students').populate('students.student_id') : [];
+
+    console.log(req.query.course);
+    console.log(roster);
+    res.render('pages/addAttendanceSelect', {queries: req.query, students: roster.students, courseList: sortedCourses});
+}
+
+exports.post_addNew = (req, res)=>{
     console.log("Triggered function attendance_addNew");
 
     const userInput = req.body;
-    console.log(userInput);
 
-    const newEntry = new Attendance(userInput);
+    let entryObj = {};
+    entryObj["staff"] = req.user._id;
+    entryObj["class"] = userInput.course;
+    entryObj["date"] = new Date(userInput.date);
     
-    newEntry.save((err, result)=>{
-        if(err){
-            console.log(err);
-        } else{
-            console.log(result);
-            res.json(result);
-        }
-    })
+    delete userInput.course;
+    delete userInput.date;
+    
+    // console.log("Entry object");
+    // console.log(entryObj);
+    // console.log("User input post-processing");
+    // console.log(userInput);
+
+    for(let student of Object.entries(userInput)){
+        entryObj["student"] = student[0];
+        entryObj["attCode"] = student[1][0];
+        let entry = new Attendance(entryObj);
+        entry.save(genericCb);
+    }
+    res.send('Attendance entered');
 };
 
 exports.attendance_update = (req,res)=>{

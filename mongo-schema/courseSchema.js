@@ -5,18 +5,24 @@ const Student = require('./studentSchema');
 const Staff = require('./staffSchema');
 
 const courseSchema = new Schema({
-    schoolYear: {type: Number, min: 2020},
-    term: {type: Number, min: 1, max: 7},
+    schoolYear: {type: Number, min: 2020, required: true},
+    term: {type: Number, min: 1, max: 7, required: true},
     status: {type: String, default: "active"},
-    codes: [{type: String}],
-    name: {type: String},
+    code: {type: String},
+    courseName: {type: String, required: true},
+    classAlias: {type: String},
+    section: {type: Number, min: 1, max: 10},
     period: {type: Number, min: 1, max: 7},
     staff: [{type: Schema.Types.ObjectId, ref: 'Staff' }],
     students: [{
         student_id: {type: Schema.Types.ObjectId, ref: 'Student'}, 
-        code: {type: String}, 
-        status: {type: String, default: "active"}
-    }]
+        status: {type: String, default: "active"},
+        startDate: {type: Date},
+        endDate: {type: Date}
+    }],
+    special: [{type: String}],
+    startDate: {type: Date},
+    endDate: {type: Date}
 }, {timestamps: true, strict: "throw"});
 
 module.exports = mongoose.model('Course', courseSchema);

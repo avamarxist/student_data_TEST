@@ -6,6 +6,7 @@ require('../passport');
 const User = require('../mongo-schema/userSchema');
 
 router.get('/login', (req, res)=>{
+    console.log(`req.user exists ${req.user == true}`)
     res.render('pages/login');
 })
 
@@ -13,7 +14,10 @@ router.get('/google',
     passport.authenticate('google', { scope: ['https://www.googleapis.com/auth/plus.login', 'profile', 'email'] }));
 
 router.get('/google/callback', 
-    passport.authenticate('google', { failureRedirect: '/auth/login' }), 
+    passport.authenticate('google', { 
+        successRedirect: '/',
+        failureRedirect: '/auth/login'
+    }), 
     (req, res)=> { res.redirect('/') }
 );
 

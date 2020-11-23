@@ -4,11 +4,13 @@ const Staff = require('./mongo-schema/staffSchema');
 const User = require('./mongo-schema/userSchema');
 
 passport.serializeUser(function(user, done) {
-    done(null, user);
+    done(null, user._id);
   });
   
-passport.deserializeUser(function(user, done) {
-    done(null, user);
+passport.deserializeUser(function(id, done) {
+    User.findById(id, function(err, user) {
+        done(err, user);
+    });
 });
 
 passport.use(new GoogleStrategy({
@@ -20,15 +22,17 @@ passport.use(new GoogleStrategy({
         console.log(profile);
         User.findOne({google_id: profile.id}, (err, user)=>{
             if(user){
-                console.log("user found");
+                if(err){console.log(`Error: ${err}`);}
+                console.log(`User: ${user}`);
                 return done(err, user);
 
             } else{
-                console.log("user not found, looking for staff");
-                Staff.findOne({mainEmail: profile.email }, (err, result)=>{
-                    console.log(`Staff: `)
+                let profileEmail = profile.emails[0].value;
+                let emailRegEx = new RegExp(profileEmail, 'i');
+                console.log(`user not found, looking for staff with email ${profileEmail}`);
+                Staff.findOne({mainEmail: emailRegEx }).exec((err, result)=>{
                     if(result){
-                        console.log("staff found, making a user account");
+                        console.log(`mail matches ${result.lName}, ${result.fName}, making a user account`);
                         new User({
                             google_id: profile.id,
                             staff_id: result._id,
@@ -37,10 +41,14 @@ passport.use(new GoogleStrategy({
                             console.log("user created");
                             done(null, newUser);
                         });
+                    } else{ 
+                        console.log(`No matching staff matching ${profileEmail}, contact administrator`);
+                        return done(err, null);
                     }
                 })
-            };
-        // return done(null, profile);
+            }
+            // return done(null, profile);
         });
     }
 ));
+

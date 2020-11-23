@@ -4,9 +4,10 @@
     </head>
 
     <body>
+        <%- include('../partials/dashboard') %>
         <h1>Choose data import template option and upload file</h1>
 
-        <form method="POST" action="/sheets/import" enctype="multipart/form-data">
+        <form method="POST" action="/updates/import" enctype="multipart/form-data">
 
             <div class = "form-group">
                 <label for="templateType">Select the type of spreadsheet you are uploading</label>

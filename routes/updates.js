@@ -1,15 +1,19 @@
 const express = require('express');
 const router = express.Router();
+const multer = require('multer');
+const storage = multer.memoryStorage();
+const upload = multer({storage: storage});
 
-const studentController = require('../controllers/studentController');
-const staffController = require('../controllers/staffController');
 const courseController = require('../controllers/courseController');
+const staffController = require('../controllers/staffController');
+const studentController = require('../controllers/studentController');
+const imports = require('../controllers/importController');
 
-// STUDENT ROUTES 
+router.get('/', (req, res)=>{
+    res.render('pages/mainUpdates');
+})
 
-router.get('/student/view', studentController.students_list);
-
-// router.get('/student/view/:id', studentController.student_detail);
+// add or update routes
 
 router.get('/student/add', (req, res)=>{
     res.render('pages/addStudent', {})
@@ -17,21 +21,11 @@ router.get('/student/add', (req, res)=>{
 
 router.post('/student/add', studentController.student_addNew);
 
-// STAFF ROUTES
-
-router.get('/staff/view', staffController.staff_list);
-
-router.get('/staff/view:id', staffController.staff_detail);
-
 router.get('/staff/add', (req, res)=>{
     res.render('pages/addStaff', {})
 })
 
 router.post('/staff/add', staffController.staff_addNew);
-
-// COURSE ROUTES
-
-router.get('/course', courseController.course_list_full);
 
 router.get('/course/add', courseController.course_addNew_get);
 
@@ -40,5 +34,13 @@ router.post('/course/add', courseController.course_addNew_post);
 router.get('/course/add/roster/:id', courseController.course_addStudents_get);
 
 router.post('/course/add/roster/:id', courseController.course_addStudents_post);
+
+// import routes
+
+router.get('/import', imports.upload_view);
+
+router.post('/import', upload.single('fileUpload'), imports.upload_post);
+
+// export routes
 
 module.exports = router;

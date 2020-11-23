@@ -1,5 +1,6 @@
 const {queryCb} = require('../helpers');
-
+const Comment = require('../mongo-schema/commentSchema');
+const Staff = require('../mongo-schema/staffSchema');
 const Student = require('../mongo-schema/studentSchema');
 
 exports.students_list = (req, res)=>{
@@ -14,18 +15,34 @@ exports.students_list = (req, res)=>{
     });
 };
 
-exports.student_detail = (req,res)=>{
+exports.student_detail = async (req,res)=>{
     console.log("Triggered function students_detail");
-    let studentID = req.params.id;
-    console.log(`student id: ${studentID}`);
-    Student.findById(studentID, (err, docs)=>{
-        if(err){
-            console.log(err);
-        } else{
-            console.log(JSON.stringify(docs, null, 4));
-            res.json(docs);
-        }
-    });
+    
+    let studentID;
+    if(req.body.student){studentID = req.body.student}
+    else{studentID = req.params.id;}
+    console.log(studentID);
+
+    let activeStudents;
+    if(req.session.activeStudents){ activeStudents = req.session.activeStudents; }
+    else{
+        activeStudents = await Student.find({status: "active"});
+    }
+
+    // const search = async()=>{
+    //     let [data, activeStudents] = await Promise.all([
+    //         Student.findById(studentID).populate('courses.courseId'),
+    //         Student.find({status: "active"})
+    //     ]);
+    //     return {data, activeStudents}
+    // }
+    
+
+    let data = await Student.findById(studentID).populate('courses.courseId');
+    
+    console.log(`active students: ${activeStudents.length}`);
+    console.log(data);
+    res.render('pages/viewStudentDetails', {data: data, activeStudents: activeStudents});
 };
 
 exports.student_addNew = (req, res)=>{

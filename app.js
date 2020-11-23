@@ -1,40 +1,33 @@
 const express = require('express');
-const session = require('cookie-session');
+const session = require('express-session');
 const helmet = require('helmet');
+const mongoose = require('mongoose');
+const MongoStore = require('connect-mongo')(session);
 const multer = require('multer');
 const passport = require('passport');
 require('./passport');
-// const bodyParser = require('body-parser');
-// const httpsServer = require('https');
-// const path = require('path');
 
 const app = express();
 
 app.use(session({
+  secret: 'Where no man has gone before',
   name: 'session',
-  keys: ['key1', 'key2'],
+  store: new MongoStore({mongooseConnection: mongoose.connection}),
   cookie: {
-    secure: true,
+    // secure: true,
     httpOnly: true,
-    maxAge: 2*60*60*1000
+    maxAge: 2*60*60*1000,
+    saveUnintialized: false
   }
 }));
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }))
 app.use(helmet());
-const upload = multer();
-app.use(upload.array()); 
-app.use(passport.initialize());
-app.use(passport.session());
 // const upload = multer();
 // app.use(upload.array()); 
-
-// const formidable = require('express-formidable');
-// app.use(formidable({
-//     uploadDir: './uploads',
-//     multiples: true
-// }))
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(function (err, req, res, next) {
     console.log('This is the invalid field ->', err.field)
@@ -47,20 +40,19 @@ app.set('view engine', 'ejs');
 // set up primary routes
 
 const auth = require('./routes/auth');
-const catalog = require("./routes/catalog");
+const records = require("./routes/records");
 const entries = require("./routes/entries");
-const importExport = require("./routes/import_export");
+const updates = require("./routes/updates");
 const home = require('./routes/home');
 
 app.use('/auth', auth);
-app.use('/catalog', catalog);
+app.use('/records', records);
 app.use('/entries', entries);
-app.use('/sheets', importExport);
+app.use('/updates', updates);
 app.use('/', home);
 
 // connect to DB and start server
 
-const mongoose = require('mongoose');
 const PORT = process.env.PORT || 3000;
 const url = "mongodb+srv://" + process.env.DB_HOST + process.env.DB_PORT + process.env.DB_NAME + process.env.DB_QUERY;
 console.log(url);

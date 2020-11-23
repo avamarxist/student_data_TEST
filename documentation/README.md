@@ -35,6 +35,6 @@
     [ ] Export comments to iLog
 
 [ ] QoL considerations
-    [ ] Add helmet to sanitize headers
+    [x] Add helmet to sanitize headers
     [ ] Sanitize form data
-    [ ] USER AUTHENTICATION
+    [x] Passport authenticate with Google

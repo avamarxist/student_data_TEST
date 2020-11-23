@@ -4,46 +4,39 @@
     </head>
 
     <body>
+        <%- include('../partials/dashboard') %>
         <h1> Student Details </h1>
 
-        <form method="POST">
+        <form method="POST" action="/records/student/view/">
             <div class="form-group row">
                 <select name="student" class="form-control" id="student">
                     <option value="">No student selected</option>
-                    <% for(let student of data.activeStudents){ %>
+                    <% for(let student of activeStudents){ %>
                         <option value="<%= student._id %>"><%= `${student.lName}, ${student.fName}` %></option>
                     <% } %>
                 </select>
             </div>
-            <select name="staff" class="form-control" id="staff">
-                    <option value="">No staff selected</option>
-                    <% for(let staff of data.activeStaff){ %>
-                        <option value="<%= staff._id %>"><%= `${staff.lName}, ${staff.fName}` %></option>
-                    <% } %>
-                </select>
 
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary" >Refine list</button>
             </div>
         </form>
 
-        <% for(let comment of data.data) { %>
+        <% let student = data %>
             <article>
-                <p>
-                    <b> Staff: </b>
-                    <% for(let staff of comment.staff){ %>
-                        <%- `${staff.lName}, ${staff.fName}; ` %>
-                    <% } %>
-                    <br>
-                    <b>Students:</b>
-                    <% for(let student of comment.student){ %>
-                        <%- `${student.lName}, ${student.fName}; ` %>
-                    <% } %>
-                    <br>
-                    <i><%= comment.createdAt %></i>
-                </p>
-                <p><%= comment.note %></p>
+                <h3><%- `${student.lName}, ${student.fName} -- ${student.osis}` %></h3>
+                <p><%- `Level: ${student.level}  Grad Cohort: ${student.gradCohort}` %></p>
+                <p>Courses:</p>
+                <% for(let c of student.courses) { %>
+                    <li><%- `${c.courseId.code} - ${c.courseId.schoolYear}, term ${c.courseId.term}` %></li>
+                <% } %>
+                <p>Comments</p>
+                <% for(let comment of student.comments) { %>
+                    <li>
+                        <%- `${comment.staff} on ${comment.createdAt}` %><br>
+                        <i><%- `${comment.note}` %></i>
+                    </li>
+                <% } %>
             </article>
-        <% } %>
     </body>
 </html>

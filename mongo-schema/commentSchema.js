@@ -8,6 +8,7 @@ const commentSchema = new Schema({
     staff: [{type: Schema.Types.ObjectId, required: true, ref: 'Staff'}],
     student: [{type: Schema.Types.ObjectId, required: true, ref: 'Student'}],
     note: {type: String, maxlength: 1000},
+    commentDateTime: {type: Date}
 }, {timestamps: true, strict: "throw"});
 
 module.exports = mongoose.model('comment', commentSchema);

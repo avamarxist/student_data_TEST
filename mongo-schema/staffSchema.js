@@ -8,12 +8,14 @@ const staffSchema = new Schema({
     status: {
         type: String,
         default: "active",
+        lowercase: true,
         enum: ["active", "on leave", "inactive"]
     },
     lName: {type: String},
     fName: {type: String},
+    roles: [{type: String}],
     mainEmail: {type: String},
-    office: {type: String},
+    room: {type: String},
     organization: {type: String},
     mainEmail: {type: String},
     phoneExt: {type: String},

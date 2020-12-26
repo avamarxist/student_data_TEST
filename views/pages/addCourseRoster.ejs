@@ -4,7 +4,8 @@
     </head>
 
     <body>
-
+        <%- include('../partials/dashboard') %>
+        <%- include('../partials/messages') %>
         <h2>Add students to roster</h2>
 
         <form method='POST' action="<%- '/catalog/course/add/roster/' + data.id %>">

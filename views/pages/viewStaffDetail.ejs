@@ -1,0 +1,40 @@
+<html>
+    <head>
+        <%- include('../partials/head') %>
+    </head>
+
+    <body>
+        <%- include('../partials/dashboard') %>
+        <%- include('../partials/messages') %>
+
+        <% let info = data.staffInfo %>
+
+        <a href="/records/staff/view">Back to staff directory</a>
+        <br>
+        <h2><%= `${info.lName}, ${info.fName}` %></h2>
+        <p><%= `Status: ${info.status}` %></p>
+        <p><%= `Email: ${info.mainEmail}` %></p>
+        <h3>Active Classes</h3>
+        <% for(let course of data.activeCourses) { %>
+            <p>
+                <%= `Pd. ${course._id} - ${course.classAlias}` %> <br>
+                <% for(let code of course.codes){ %>
+                    <i><%- `${code}, ` %></i>
+                <% } %>
+            </p>
+
+        <% } %>
+        <h3>Recent comments</h3>
+        <% for(let comment of data.recentComments) { %>
+            <p>
+                <b><%- comment.date %></b>
+                <% for(let student of comment.student) { %>
+                    <%= `${student.lName}, ${student.fName};` %>
+                <% } %>  
+                <br>
+                <i><%- comment.note %></i>
+            </p>
+        <% } %>
+
+    </body>
+</html>

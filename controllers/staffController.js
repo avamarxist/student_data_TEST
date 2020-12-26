@@ -1,34 +1,57 @@
 const {queryCb} = require('../helpers');
+const mongoose = require('mongoose');
 
 const Staff = require('../mongo-schema/staffSchema');
+const Course = require('../mongo-schema/courseSchema');
+const Comment = require('../mongo-schema/commentSchema');
 
 exports.staff_list = (req, res)=>{
     console.log("Triggered function staff_list");;
 
-    Staff.find({})
+    Staff.find({status: "active"})
+        .sort('lName')
         .populate('courses')
         .exec((err, results)=>{
             if(err){
                 console.log(results);
             } else{
                 console.log(results);
-                res.render('pages/viewStaff', {data: results});
+                res.render('pages/viewStaff', {data: results, message: "", params: {}});
             }
         });
 };
 
-exports.staff_detail = (req,res)=>{
-    console.log("Triggered function students_detail");
-    let staffID = req.params.id;
-    console.log(`Staff id: ${staffID}`);
-    Staff.findById(staffID, (err, docs)=>{
-        if(err){
-            console.log(err);
-        } else{
-            console.log(JSON.stringify(docs, null, 4));
-            res.json(docs);
-        }
-    });
+exports.staff_detail = async (req,res)=>{
+    console.log("Triggered function staff_detail");
+    const staffId = mongoose.Types.ObjectId(req.params.id);
+    console.log(`Staff id: ${staffId}`);
+
+    let staffInfo = await Staff.findById(staffId);
+
+    let activeCourses = await Course.aggregate()
+        .match({status: "active", staff: {$elemMatch: {$eq: staffId}}})
+        .group({
+            _id: "$period",
+            classAlias: {$first: '$classAlias'},
+            courseNames: {$addToSet: '$courseName'},
+            codes: {$addToSet: '$code'}
+        })
+        .sort('_id')
+        
+    let recentComments = await Comment.aggregate()
+        .match({staff: {$elemMatch: {$eq: staffId}}})
+        .limit(5)
+        .lookup({from: 'students', localField: 'student', foreignField: '_id', as: 'student'})
+
+    let data = {
+        staffInfo: staffInfo,
+        activeCourses: activeCourses,
+        recentComments: recentComments
+    }
+
+    // res.send(recentComments)
+    res.render('pages/viewStaffDetail', {data: data, message: "", params: {}});
+
 };
 
 

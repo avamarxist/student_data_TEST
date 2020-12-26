@@ -1,0 +1,30 @@
+<html>
+    <head>
+        <%- include('../partials/head') %>
+    </head>
+    <body>
+        <%- include('../partials/dashboard') %>
+        <%- include('../partials/messages') %>
+
+        <h2>Give courses the same alias to have them grouped together</h2>
+        <div class="row">
+            <% for(let c of activeClasses){ %>
+                <div class="col-xs-6">
+                    <div class="card" style="width: 20rem;">
+                        <div class="card-header">
+                            <%- `Pd. ${c._id}` %>
+                        </div>
+                        <ul class="list-group list-group-flush">
+                                <% for(let student of c.studentInfo) { %>
+                                    <li class="list-group-item">
+                                        <a href="<%- `/records/student/view/${student._id}` %>"><%- `${student.lName}, ${student.fName}` %></a>
+                                    </li>
+                                <% } %>
+                        </ul>
+                    </div>
+                </div>  
+            <% } %>
+        </div>
+        
+    </body>
+</html>

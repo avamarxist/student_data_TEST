@@ -4,15 +4,19 @@
     </head>
     <body>
         <%- include('../partials/dashboard') %>
+        <%- include('../partials/messages') %>
         <p>
-            <a href="/entries/comment/list">View all comments</a>
+            <a href="/entries/comment/list">View comments (list view)</a>
+        </p>
+        <p>
+            <a href="/entries/comment/calendar">View comments (calendar view)</a>
         </p>
         <p>
             <a href="/entries/comment/add">Add comment</a>
         </p>
-        <!-- <p>
-            <a href="/entries/attendance/view">View attendance</a>
-        </p> -->
+        <p>
+            <a href="/entries/attendance/view/calendar">View your attendance book</a>
+        </p>
         <p>
             <a href="/entries/attendance/add">Take attendance</a>
         </p>

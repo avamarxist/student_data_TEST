@@ -1,0 +1,101 @@
+<html>
+    <head>
+        <%- include('../partials/head') %>
+    </head>
+
+    <body>
+        <%- include('../partials/dashboard') %>
+        <%- include('../partials/messages') %>
+        
+        <h1> View comments </h1>
+
+        <form method="GET">
+            <div class="form-group row">
+                <div class="form-group col-xs-5">
+                    <label for="date">Beginning: </label>
+                    <% let dateValue1 = ""; if(params.beginDate){dateValue1=params.beginDate}  %>
+                    <input type="date" class="form-control" id="beginDate" name="beginDate" value="<%- dateValue1 %>">
+                </div>
+                <div class="form-group col-xs-5">
+                    <label for="date">Ending: </label>
+                    <% let dateValue2 = ""; if(params.endDate){dateValue2=params.endDate}  %>
+                    <input type="date" class="form-control" id="endDate" name="endDate" value="<%- dateValue2 %>">
+                </div>
+                <div class="form-group col-xs-6">
+                    <label for="staff">Select staff</label>
+                    <select name="staff" class="form-control" id="staff">
+                        <option value="">No staff selected</option>
+                        <% for(let staff of data.activeStaff){ %>
+                            <option value="<%= staff._id %>"><%= `${staff.lName}, ${staff.fName}` %></option>
+                        <% } %>
+                    </select>
+                </div>
+                <div class="form-group col-xs-6">
+                    <label for="student">Select student</label>
+                    <select name="student" class="form-control" id="student">
+                        <option value="">No student selected</option>
+                        <% for(let student of data.activeStudents){ %>
+                            <option value="<%= student._id %>"><%= `${student.lName}, ${student.fName}` %></option>
+                        <% } %>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary" >Refine list</button>
+                </div>
+            </div>
+
+
+        </form>
+        <% 
+            let d = new Date(params.endDate);
+            let begin = new Date(params.beginDate);
+            let dateArray = [] ;
+            while(d >= begin) { 
+                if(d.getDay()<5){ 
+                    dateArray.push(d.toUTCString());
+                } 
+                d.setDate(d.getDate() - 1);
+            } 
+        %>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Students</th>
+                    <% for(let d of dateArray){ %>
+                        <th>
+                            <%- `${d.substring(0, d.length-17)}` %>
+                        </th>
+                    <% } %>
+                </tr>
+            </thead>
+            <tbody>
+                <% for(let student of data.activeStudents){ %>
+                    <tr>
+                        <th><%- `${student.lName}, ${student.fName}` %></th>
+                        <% let s = data.comments.filter(x => {
+                            let studentId = new String(student._id).trim(); 
+                            let xId = new String(x._id).trim();
+                            return studentId == xId;
+                        }) %>
+
+                        <% if(s.length > 0) { %>
+                            <% let comments = s[0].comments %>
+                            <% for(let d of dateArray){ %>
+                                <% let output = [] %>
+                                <% for(let c of comments){
+                                    let date = c.date.toUTCString();
+                                    if(date.substring(0,date.length-13) == d.substring(0,d.length-13)){
+                                        output.push(`<u>${c.staffLast}, ${c.staffFirst}</u><br>${c.note}`);
+                                    }
+                                } %>
+                                <td><%- output.join('<br><br>') %></td>
+                            <% } %>
+                        <% } %>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+
+    </body>
+</html>

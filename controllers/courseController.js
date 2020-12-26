@@ -18,19 +18,66 @@ exports.course_list_full = (req, res)=>{
     });
 };
 
-exports.course_list_active = (req,res)=>{
-    console.log("Triggered function course_list_active");
-    let courseID = req.params.id;
-    console.log(`Staff id: ${courseID}`);
-    Course.findById(courseID, (err, docs)=>{
-        if(err){
-            console.log(err);
-        } else{
-            console.log(docs);
-            res.json(docs);
-        }
-    });
+exports.view_courses_self = async (req,res)=>{
+    console.log("Triggered function view_courses_self");
+
+    if(!req.user){res.redirect('/auth/login')}
+
+    // let activeCourses = req.user.activeCourses ?
+    //                     req.user.activeCourses :
+    // let activeClasses = await Staff.aggregate()
+    //     .match({_id: req.user.staff_id})
+    //     .lookup({from: 'courses', localField: 'courses', foreignField: '_id', as: 'courseInfo'})
+    //     .project('-_id courseInfo')
+    //     .unwind('courseInfo')
+    //     .lookup({from: 'students', localField: 'courseInfo.students.student_id', foreignField: '_id', as: 'students'})
+    //     .group({_id: "$courseInfo.classAlias", students: {$push: "$students"}})
+    //     .project({students})
+        // .sort('students.lName')
+    
+    let activeClasses = await Course.aggregate()
+        .match({staff: {$elemMatch: {$eq: req.user.staff_id}}})
+        .group({_id: "$period", students: {$push: "$students"}})
+        .unwind('students')
+        .unwind('students')
+        .group({_id:"$_id", students: {$push: "$students"}})
+        .lookup({from: 'students', localField: 'students.student_id', foreignField: "_id", as: "studentInfo"})
+        .project('studentInfo')
+        .sort('studentInfo.lName')
+        .sort("_id")
+
+    // res.json(activeClasses);
+    res.render('pages/viewCoursesSelf', {activeClasses: activeClasses})
 };
+
+exports.group_courses_get = async (req, res)=>{
+    if(!req.user){res.redirect('/auth/login')}
+
+    let activeCourses = await Staff.findById(req.user.staff_id, 'courses')
+        .populate({path: 'courses', match: {status: "active"}});
+    console.log(activeCourses.courses);
+    res.render('pages/editCoursesSelf', {activeCourses: activeCourses.courses});
+        
+}
+
+exports.group_courses_post = async (req, res)=>{
+    if(!req.user){res.redirect('/auth/login')}
+
+    let userInput = req.body;
+    let output = []
+
+    for(let i=0; i<userInput.courseId.length; i++){
+        let id = userInput.courseId[i];
+        let obj = {
+            courseName: userInput.courseName[i],
+            classAlias: userInput.classAlias[i]
+        }       
+        let update = await Course.findByIdAndUpdate(id, {$set: obj}, {new: true}); 
+        output.push(update);
+    }
+    res.json(output);
+}
+
 
 
 // Add one new staff to system. 
@@ -46,7 +93,7 @@ exports.course_addNew_get = (req, res)=>{
     }
 
     queries().then((results)=>{
-        res.render('pages/addCourse', {data: results});
+        res.render('pages/addCourse', {data: results, message: "", params: {}});
     })
 }
 
@@ -94,7 +141,7 @@ exports.course_addStudents_get = (req, res)=>{
     Student.find({status: "active"}).exec((err, result)=>{
         if(err){console.log(err)}
         else{
-            res.render('pages/addCourseRoster', {data: {id: courseId, num: numEntries, activeStudents: result}});
+            res.render('pages/addCourseRoster', {data: {id: courseId, num: numEntries, activeStudents: result} , message: "", params: {}});
         }
     });
 

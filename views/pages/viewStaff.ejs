@@ -4,15 +4,16 @@
     </head>
 
     <body>
+        <%- include('../partials/dashboard') %>
+        <%- include('../partials/messages') %>
+        
         <h1> Current staff </h1>
         <% for(let staff of data) { %>
             <article>
-                <h2><%= `${staff.lName}, ${staff.fName}` %></h2>
+                <a href="<%- `/records/staff/view/${staff._id}` %>">
+                    <h2><%= `${staff.lName}, ${staff.fName}` %></h2>
+                </a>
                 <p><%= `Status: ${staff.status}` %></p>
-                <% for(let course of staff.courses) { %>
-                    <p><%= `${course.name}` %></p>
-                    <p><%= `${course.name}` %></p>
-                <% } %>
             </article>
         <% } %>
     </body>

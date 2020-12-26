@@ -3,6 +3,7 @@ const session = require('express-session');
 const helmet = require('helmet');
 const mongoose = require('mongoose');
 const MongoStore = require('connect-mongo')(session);
+const morgan = require('morgan');
 const multer = require('multer');
 const passport = require('passport');
 require('./passport');
@@ -24,6 +25,7 @@ app.use(session({
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }))
 app.use(helmet());
+app.use(morgan('tiny'));
 // const upload = multer();
 // app.use(upload.array()); 
 app.use(passport.initialize());
@@ -50,6 +52,19 @@ app.use('/records', records);
 app.use('/entries', entries);
 app.use('/updates', updates);
 app.use('/', home);
+
+// ERROR HANDLING
+app.use((error, req, res, next)=>{
+  if(error.status){
+    res.status(error.status);
+  } else{
+    res.status(500);
+  }
+  res.json({
+    message: error.message,
+    stack: process.env.NODE_ENV === 'production' ? 'OK' : error.stack
+  })
+})
 
 // connect to DB and start server
 

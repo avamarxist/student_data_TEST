@@ -1,0 +1,79 @@
+<html>
+    <head>
+        <%- include('../partials/head') %>
+    </head>
+    <body>
+        <%- include('../partials/dashboard') %>
+        <%- include('../partials/messages') %>
+
+        <form method="GET" action="/entries/attendance/view/calendar">
+            <div class="form-group row">
+                <div class="form-group col-xs-5">
+                    <label for="date">Beginning: </label>
+                    <% let dateValue1 = ""; if(params.beginDate){dateValue1=params.beginDate}  %>
+                    <input type="date" class="form-control" id="beginDate" name="beginDate" value="<%- dateValue1 %>">
+                </div>
+                <div class="form-group col-xs-5">
+                    <label for="date">Ending: </label>
+                    <% let dateValue2 = ""; if(params.endDate){dateValue2=params.endDate}  %>
+                    <input type="date" class="form-control" id="endDate" name="endDate" value="<%- dateValue2 %>">
+                </div>
+
+                <div class="form-group col-xs-6">
+                    <label for="period">Select students by period</label>
+                    <select class="form-control" id="courseSelect" name="period">
+                        <option value="">No period selected</option>
+                        <% for(let i = 1; i<=8; i++){ %>
+                            <% let isSelected=""; if(params.period == i){isSelected = "selected"} %>
+                            <option value="<%- i %>" <%- isSelected %> ><%= `Period ${i}` %></option>
+                        <% } %>
+                    </select>
+                </div> 
+            </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary" >Click to update view</button>
+            </div>
+        </form>
+
+        <% let d = new Date(params.endDate) %>
+        <% let begin = new Date(params.beginDate) %>
+        <% let dateArray = [] %>
+        <% while(d >= begin) { %>
+            <% if(d.getDay()<5){ 
+                dateArray.push(d.toUTCString()) 
+                } %>
+            <% d.setDate(d.getDate() - 1) %>
+        <% } %>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Student</th>
+                    <% for(let d of dateArray){ %>
+                        <th>
+                            <%- `${d.substring(0, d.length-17)}` %>
+                        </th>
+                    <% } %>
+                </tr>
+            </thead>
+            <tbody>
+                <% for(let student of data){ %>
+                    <tr>
+                        <th><%- `${student.studentInfo.lName}, ${student.studentInfo.fName}` %></th>
+                        <% for(let d of dateArray){ %>
+                            <% let code = "" %>
+                            <% for(let entry of student.attendance){ 
+                                if(entry.date.toUTCString() == d){ 
+                                    code = entry.atsCode;
+                                    break;
+                                }
+                            } %>
+                            <td><%- code %></td>
+                        <% } %>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+
+    </body>
+</html>

@@ -28,8 +28,8 @@ const studentSchema = new Schema({
         status: {type: String, lowercase: true, enum: ["active", "removed", "completed", "incomplete"]}
     }],
     comments: [{type: Schema.Types.ObjectId, ref: 'Comment'}],
-    gradCohort: {type: String, enum: ["U", "V", "W", "X"]},
-    learningCohort: {type: String, enum: ["Remote", "Hybrid A", "Hybrid B"]},
+    gradCohort: {type: String, uppercase: true, enum: ["U", "V", "W", "X"]},
+    learningCohort: {type: String, lowercase: true, enum: ["remote", "hybrid a", "hybrid b"]},
     attendancePct: {type: Number}
 }, {timestamps: true, strict: "throw"});
 

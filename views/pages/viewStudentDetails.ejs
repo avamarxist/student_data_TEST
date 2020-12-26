@@ -5,6 +5,8 @@
 
     <body>
         <%- include('../partials/dashboard') %>
+        <%- include('../partials/messages') %>
+        
         <h1> Student Details </h1>
 
         <form method="POST" action="/records/student/view/">
@@ -24,6 +26,7 @@
 
         <% let student = data %>
             <article>
+                <a href="<%- `/updates/student/edit/${student._id}` %>"><button id='edit'>Edit information</button></a>
                 <h3><%- `${student.lName}, ${student.fName} -- ${student.osis}` %></h3>
                 <p><%- `Level: ${student.level}  Grad Cohort: ${student.gradCohort}` %></p>
                 <p>Courses:</p>

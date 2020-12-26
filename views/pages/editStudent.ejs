@@ -8,21 +8,21 @@
         <%- include('../partials/messages') %>
         <h1>Add new student</h1>
 
-        <form method="POST" action="/updates/student/add" enctype="text/html">
+        <form method="POST" action="<%- `/updates/student/edit/${data._id}` %>" enctype="text/html">
 
             <div class="form-group row">
 
                 <div class="col-xs-3">
                     <label for="osis">OSIS #</label>
-                    <input name="osis" type="text" class="form-control" id="osis" placeholder="OSIS ID">
+                    <input name="osis" type="text" class="form-control" id="osis" value="<%- data.osis %>">
                 </div>
                 <div class="col-xs-3">
                     <label for="lName">Last Name</label>
-                    <input name="lName" type="text" class="form-control" id="lName" placeholder="Last name">
+                    <input name="lName" type="text" class="form-control" id="lName" value="<%- data.lName %>">
                 </div>
                 <div class="col-xs-3">
                     <label for="fName">First Name</label>
-                    <input name="fName" type="text" class="form-control" id="fName" placeholder="First Name">
+                    <input name="fName" type="text" class="form-control" id="fName" value="<%- data.fName %>">
                 </div>
             
             </div>
@@ -69,12 +69,6 @@
                     <label for="doeEmail">DOE Email</label>
                     <input type="email" name="doeEmail" class="form-control" id="doeEmail" placeholder="@nycstudents.net">
                 </div>
-
-                <div class="col-xs-3">
-                    <label for="doeEmail">Student Phone No.</label>
-                    <input type="text" name="contacts" class="form-control" id="contacts" placeholder="555-555-5555">
-                </div>
-
             </div>
             
             <div class="form-actions">

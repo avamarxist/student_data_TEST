@@ -10,19 +10,19 @@ const studentController = require('../controllers/studentController');
 const imports = require('../controllers/importController');
 
 router.get('/', (req, res)=>{
-    res.render('pages/mainUpdates');
+    res.render('pages/mainUpdates', {data: {}, message: "", params: {}});
 })
 
-// add or update routes
+// add routes
 
 router.get('/student/add', (req, res)=>{
-    res.render('pages/addStudent', {})
+    res.render('pages/addStudent', {data: {}, message: "", params: {}})
 })
 
 router.post('/student/add', studentController.student_addNew);
 
 router.get('/staff/add', (req, res)=>{
-    res.render('pages/addStaff', {})
+    res.render('pages/addStaff', {data: {}, message: "", params: {}})
 })
 
 router.post('/staff/add', staffController.staff_addNew);
@@ -34,6 +34,14 @@ router.post('/course/add', courseController.course_addNew_post);
 router.get('/course/add/roster/:id', courseController.course_addStudents_get);
 
 router.post('/course/add/roster/:id', courseController.course_addStudents_post);
+
+// edit routes
+
+router.get('/student/edit/:id', studentController.student_update_get);
+
+router.get('/course/edit', courseController.group_courses_get);
+
+router.post('/course/edit', courseController.group_courses_post);
 
 // import routes
 

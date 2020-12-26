@@ -1,0 +1,33 @@
+<html>
+    <head>
+        <%- include('../partials/head') %>
+    </head>
+    <body>
+        <%- include('../partials/dashboard') %>
+        <%- include('../partials/messages') %>
+
+
+        <h2>Give courses the same alias to have them grouped together</h2>
+
+        <form method="POST" action="/updates/course/edit">
+
+            <% for(let course of activeCourses){ %>
+                <div class="form-group row">
+                    <div class="col-xs-6">
+                        <%- `Pd. ${course.period} ${course.code}-${course.section}` %>
+                    </div>
+                    <input type="hidden" id="courseId" name="courseId" value="<%- course._id %>">
+                    <div class="form-group col-xs-6">
+                        <input type="text" value="<%- course.courseName %>" class="form-control" id="courseName" name="courseName">
+                    </div>
+                    <div class="form-group col-xs-6">
+                        <input type="text" value="<%- course.classAlias %>" class="form-control" id="classAlias" name="classAlias">
+                    </div>
+                </div>
+            <% } %>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary" >Submit changes</button>
+            </div>
+        </form>
+    </body>
+</html>

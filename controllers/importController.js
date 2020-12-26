@@ -10,7 +10,7 @@ const Staff = require('../mongo-schema/staffSchema');
 
 exports.upload_view = (req, res)=>{
     
-    res.render('pages/mainImport', {});
+    res.render('pages/mainImport', {data: {}, message: "", params: {}});
 }
 
 exports.upload_post = (req, res, next)=>{
@@ -26,7 +26,7 @@ exports.upload_post = (req, res, next)=>{
     else if(template == "staffInfo"){ staffInfo(req, res);}
     else if(template == "courseProgram"){ courseProgram(req, res);}
     else if(template == "courseRoster"){ courseRoster(req, res);}
-    else{res.send("Template not supported");}
+    else{res.render('pages/mainImport', {data: {}, message: "Template not supported", params: {}});}
 
 }
 
@@ -143,7 +143,7 @@ const courseProgram = (req, res)=>{
         }
     })
     .on("end", ()=>{
-        res.render('pages/mainImport', {});
+        res.render('pages/mainImport', {data: {}, message: "", params: {}});
     });
 };
 
@@ -216,6 +216,6 @@ const courseRoster = (req, res)=>{
         }
     })
     .on("end", ()=>{
-        res.render('pages/mainImport');
+        res.render('pages/mainImport', {data: {}, message: "", params: {}});
     });
 };

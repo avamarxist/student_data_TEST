@@ -8,7 +8,8 @@ router.get('/', (req, res)=>{
     if(!req.user){ res.redirect('/auth/login')}
     console.log(req.user);
     Staff.findById(req.user.staff_id, 'mainEmail').then((result)=>{
-        res.render('pages/home', {email: result.mainEmail});
+        let data = {email: result.mainEmail};
+        res.render('pages/home', {data: data, message: '', params: {}});
     })
     .catch((err)=>{console.log(err)})
     

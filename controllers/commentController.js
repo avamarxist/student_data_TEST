@@ -4,6 +4,7 @@ const Comment = require('../mongo-schema/commentSchema');
 const Staff = require('../mongo-schema/staffSchema');
 const Student = require('../mongo-schema/studentSchema');
 
+
 exports.comment_list = async (req, res)=>{
     console.log("Triggered function comment_list");
 
@@ -29,22 +30,80 @@ exports.comment_list = async (req, res)=>{
 
 
     let results = {data, activeStaff, activeStudents};
-    res.render('pages/viewComment', {data:results});
+    console.log(data);
+    res.render('pages/viewComment', {data:results, message: "", params: {}});
 }
 
 
-exports.comment_calendar = (req,res)=>{
-    console.log("Triggered function students_detail");
-    let staffID = req.params.id;
-    console.log(`Staff id: ${staffID}`);
-    Staff.findById(staffID, (err, docs)=>{
-        if(err){
-            console.log(err);
-        } else{
-            console.log(JSON.stringify(docs, null, 4));
-            res.json(docs);
-        }
-    });
+exports.comment_calendar_get = async (req,res)=>{
+
+    console.log("Triggered function comment_calendar");
+
+
+    let student = req.body.student;
+    let staff = req.body.staff;
+    
+    let now = new Date();
+    let endDate = req.query.endDate || now.toUTCString();
+    let beginDate;
+    if(req.query.beginDate){beginDate = req.query.beginDate}
+    else{
+        now.setDate(now.getDate()-7);
+        beginDate = now.toUTCString();
+    }
+
+    let query = {commentDateTime: {$gte: new Date(beginDate), $lte: new Date(endDate)}};
+
+    if(student){ query["student"] = student }
+    if(staff){ query["staff"] = staff }
+
+    let comments = await Comment.aggregate()
+        .match(query)
+        .unwind('student')
+        .unwind('staff')
+        .lookup({from: 'students', localField: 'student', foreignField: '_id', as: 'studentInfo'})
+        .lookup({from: 'staff', localField: 'staff', foreignField: '_id', as: 'staffInfo'})
+        .project({
+            _id: '$_id',
+            staffId: '$staff',
+            staffLast: '$staffInfo.lName',
+            staffFirst: '$staffInfo.fName',
+            date: '$commentDateTime',
+            studentId: '$student',
+            studentLast: '$studentInfo.lName',
+            studentFirst: '$studentInfo.fName',
+            note: '$note'
+        })
+        .unwind('staffLast').unwind('staffFirst').unwind('studentLast').unwind('studentFirst')
+        .sort('date')
+        .group({
+            _id: '$studentId',
+            studentLast: {$first: '$studentLast'},
+            studentFirst: {$first: '$studentFirst'},
+            comments:{
+                $addToSet: {
+                    date: "$date",
+                    note: '$note',
+                    staffId: '$staffId',
+                    staffLast: '$staffLast',
+                    staffFirst: '$staffFirst'
+                }
+            }
+        })
+        .sort('studentLast studentFirst')
+
+    let activeStaff = req.session.activeStaff ? req.session.activeStaff : await Staff.find({}, '_id lName fName');
+    let activeStudents = req.session.activeStudents ? req.session.activeStudents : await Student.find({status:"active"}, '_id osis lName fName');
+
+
+    let data = {comments, activeStaff, activeStudents}
+    let params = {beginDate: beginDate, endDate: endDate};
+
+    // console.log(matches);
+    console.log(data);
+    console.log(activeStudents);
+    // res.send(data);
+    res.render('pages/viewCommentCalendar', {data: data, message: "", params: params})
 };
 
 exports.comment_addNew_get = (req, res)=>{
@@ -59,7 +118,7 @@ exports.comment_addNew_get = (req, res)=>{
     }
 
     queries().then((results)=>{
-        res.render('pages/addComment', {data: results});
+        res.render('pages/addComment', {data: results, message: "", params: {}});
     });
 }
 
@@ -71,7 +130,7 @@ exports.comment_addNew_post = (req, res)=>{
 
     const userInput = req.body;
 
-    userInput['commentDateTime'] = new Date(userInput.date);
+    userInput['commentDateTime'] = userInput.date ? userInput.date : new Date();
     delete userInput.date;
 
 
@@ -79,13 +138,13 @@ exports.comment_addNew_post = (req, res)=>{
 
     const newComment = new Comment(userInput);
 
-    Staff.findByIdAndUpdate(userInput.staff, {$addToSet: {comments: newComment.id}}, {upsert: true}, genericCb);
+    Staff.findByIdAndUpdate(userInput.staff, {$addToSet: {comments: newComment.id}}, {}, genericCb);
     
-    Student.findByIdAndUpdate(userInput.student, {$addToSet: {comments: newComment.id}}, {upsert: true}, genericCb);
+    Student.findByIdAndUpdate(userInput.student, {$addToSet: {comments: newComment.id}}, {}, genericCb);
     
     newComment.save((err, result)=>{
         if(err){console.log(err)}
-        else{res.json(result)}
+        else{res.redirect('/entries/comment/add')}
     });
 };
 

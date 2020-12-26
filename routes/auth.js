@@ -7,7 +7,7 @@ const User = require('../mongo-schema/userSchema');
 
 router.get('/login', (req, res)=>{
     console.log(`req.user exists ${req.user == true}`)
-    res.render('pages/login');
+    res.render('pages/login', {data: {}, message: "", params: {}});
 })
 
 router.get('/google',

@@ -1,3 +1,4 @@
+const { session } = require('passport');
 const {queryCb} = require('../helpers');
 const Comment = require('../mongo-schema/commentSchema');
 const Staff = require('../mongo-schema/staffSchema');
@@ -10,7 +11,7 @@ exports.students_list = (req, res)=>{
         if(err){
             console.log(err);
         } else{
-            res.render('pages/viewStudents', {data: results});
+            res.render('pages/viewStudents', {data: results, message: "", params: {}});
         }
     });
 };
@@ -27,22 +28,14 @@ exports.student_detail = async (req,res)=>{
     if(req.session.activeStudents){ activeStudents = req.session.activeStudents; }
     else{
         activeStudents = await Student.find({status: "active"});
+        session.activeStudents = activeStudents;
     }
-
-    // const search = async()=>{
-    //     let [data, activeStudents] = await Promise.all([
-    //         Student.findById(studentID).populate('courses.courseId'),
-    //         Student.find({status: "active"})
-    //     ]);
-    //     return {data, activeStudents}
-    // }
-    
 
     let data = await Student.findById(studentID).populate('courses.courseId');
     
-    console.log(`active students: ${activeStudents.length}`);
-    console.log(data);
-    res.render('pages/viewStudentDetails', {data: data, activeStudents: activeStudents});
+    // console.log(`active students: ${activeStudents.length}`);
+    // console.log(data);
+    res.render('pages/viewStudentDetails', {data: data, activeStudents: activeStudents, message: "", params: {} });
 };
 
 exports.student_addNew = (req, res)=>{
@@ -64,7 +57,13 @@ exports.student_addNew = (req, res)=>{
     })
 };
 
-exports.student_update = (req,res)=>{
-    res.send('Update student not yet implemented');
+exports.student_update_get = async (req,res)=>{
+    if(!req.user){ res.redirect('/auth/login'); }
+    
+    // get info for selected student
+    let currentInfo = await Student.findById(req.params.id)
+
+    // res.send(currentInfo);
+    res.render('pages/editStudent', { data: currentInfo, message: "", params: {} })
 };
 

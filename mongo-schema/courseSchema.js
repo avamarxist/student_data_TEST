@@ -23,6 +23,6 @@ const courseSchema = new Schema({
     special: [{type: String}],
     startDate: {type: Date},
     endDate: {type: Date}
-}, {timestamps: true, strict: "throw"});
+}, {collection: "courses", timestamps: true, strict: "throw"});
 
 module.exports = mongoose.model('Course', courseSchema);

@@ -19,11 +19,11 @@ passport.use(new GoogleStrategy({
     callbackURL: 'http://localhost:3000/auth/google/callback'
 },
     (accessToken, refreshToken, profile, done)=>{
-        console.log(profile);
+        // console.log(profile);
         User.findOne({google_id: profile.id}, (err, user)=>{
             if(user){
                 if(err){console.log(`Error: ${err}`);}
-                console.log(`User: ${user}`);
+                // console.log(`User: ${user}`);
                 return done(err, user);
 
             } else{

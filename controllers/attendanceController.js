@@ -1,6 +1,7 @@
 const {genericCb} = require('../helpers');
 
 const Attendance = require('../mongo-schema/attendanceSchema');
+const { findOneAndUpdate } = require('../mongo-schema/courseSchema');
 const Course = require('../mongo-schema/courseSchema');
 const Staff = require('../mongo-schema/staffSchema');
 
@@ -17,18 +18,94 @@ exports.student_full = (req, res)=>{
     });
 };
 
-exports.class_full = (req,res)=>{
-    console.log("Triggered function students_detail");
-    let studentID = req.params.id;
-    console.log(`student id: ${studentID}`);
-    Student.findById(studentID, (err, docs)=>{
-        if(err){
-            console.log(err);
-        } else{
-            console.log(JSON.stringify(docs, null, 4));
-            res.json(docs);
-        }
-    });
+exports.class_list_get = async (req,res)=>{
+
+    if(!req.user){res.redirect('/auth/login')}
+
+    let staffId = req.query.staff || req.user.staff_id;
+    let status = req.query.status;
+    let period = parseInt(req.query.period);
+    
+    let queries = {
+        beginDate: req.query.beginDate,
+        endDate: req.query.endDate
+    }
+
+    console.log(period);
+
+    let attMatch = {
+        staff: staffId
+    }
+    if(period){attMatch["period"] = period;}
+
+    let output = await Attendance.aggregate()
+        .lookup({from: 'courses', localField: 'course', foreignField: '_id', as: 'courseInfo'})
+        .match({
+            'courseInfo.staff': {$elemMatch: {$eq: staffId}},
+            'courseInfo.period': period
+        })
+        .unwind('attendance')
+        .group({
+            _id: "$attendance.student",
+            attendance: {
+                $addToSet: {
+                    date: "$date",
+                    atsCode: "$attendance.atsCode"
+                }
+            }
+        })
+        .lookup({from: 'students', localField: '_id', foreignField: '_id', as: 'studentInfo'})
+        .unwind('studentInfo')
+        .sort("studentInfo.lName")
+
+    // res.send(output);
+    // console.log(queries);
+    res.render('pages/viewAttendanceList', {data: output, message: "", params: queries})
+};
+
+exports.class_calendar_get = async (req,res)=>{
+
+    if(!req.user){res.redirect('/auth/login')}
+
+    let staffId = req.query.staff || req.user.staff_id;
+    let status = req.query.status;
+    let period = parseInt(req.query.period);
+    
+    let queries = {
+        beginDate: req.query.beginDate,
+        endDate: req.query.endDate
+    }
+
+    console.log(period);
+
+    let attMatch = {
+        staff: staffId
+    }
+    if(period){attMatch["period"] = period;}
+
+    let output = await Attendance.aggregate()
+        .lookup({from: 'courses', localField: 'course', foreignField: '_id', as: 'courseInfo'})
+        .match({
+            'courseInfo.staff': {$elemMatch: {$eq: staffId}},
+            'courseInfo.period': period
+        })
+        .unwind('attendance')
+        .group({
+            _id: "$attendance.student",
+            attendance: {
+                $addToSet: {
+                    date: "$date",
+                    atsCode: "$attendance.atsCode"
+                }
+            }
+        })
+        .lookup({from: 'students', localField: '_id', foreignField: '_id', as: 'studentInfo'})
+        .unwind('studentInfo')
+        .sort("studentInfo.lName")
+
+    // res.send(output);
+    // console.log(queries);
+    res.render('pages/viewAttendanceClass', {data: output, message: "", params: queries})
 };
 
 exports.staff_attendance_full = (req, res)=>{
@@ -45,20 +122,10 @@ exports.student_class_attendance = (req, res)=>{
 exports.get_addNew = async (req, res)=>{
     if(!req.user){ res.redirect('/auth/login'); }
     console.log("Triggered get_addNew");
-    
-    // // if(!req.user.role.includes("teacher")){
-    // //     res.send('You must be a teacher to add attendance');
-    // //     return;
-    // // }
 
-    let course = req.query.course;
-    
-    let fromDate = req.query.fromDate;
-    let toDate = req.query.toDate;
-
-    // if(course){ query[""] = student }
-    // if(staff){ query["staff"] = staff }
-
+    let course = req.query.course; 
+    let period = parseInt(req.query.period);
+    let date = new Date(req.query.date);
 
     let activeCourses = await Staff.findById(req.user.staff_id)
         .select('courses')
@@ -74,46 +141,127 @@ exports.get_addNew = async (req, res)=>{
             else { return -1 }
         } else { return -1 }
     });
-    let activeStaff = req.session.activeStaff ? req.session.activeStaff : await Staff.find({}, '_id lName fName');
+    // let activeStaff = req.session.activeStaff ? req.session.activeStaff : await Staff.find({}, '_id lName fName');
     
-    let query = {};
-    if(req.query.course){
-        query["_id"] = req.query.course;
+    let courseFilter = {
+        staff: {$elemMatch: {$eq: req.user.staff_id}},
     }
+    if(period){courseFilter["period"] = period}
+    else if(course){courseFilter["_id"] = course};
 
-    const roster = req.query.course ? await Course.findOne(query, 'students').populate('students.student_id') : [];
+    let attFilter = {}
+    if(period){attFilter["period"] = period}
+    else if(course){attFilter["course"] = course}
+    console.log(attFilter);
 
-    console.log(req.query.course);
-    console.log(roster);
-    res.render('pages/addAttendanceSelect', {queries: req.query, students: roster.students, courseList: sortedCourses});
+    let roster={};
+    let attendance = {};
+    if(period || course){   
+        roster = await Course.aggregate()
+            .match(courseFilter)
+            .group({
+                _id: "$period", 
+                entry: {
+                    $push: {
+                        course: "$_id",
+                        students: "$students"
+                    }
+                }
+            })
+            .unwind('entry')
+            .project('-_id entry')
+            .unwind('entry.students')
+            .lookup({from: 'students', localField: 'entry.students.student_id', foreignField: "_id", as: "studentInfo"})
+            .project('-_id entry.course studentInfo')
+            .unwind('studentInfo')
+            .sort('studentInfo.lName')
+        
+        attendance = await Attendance.aggregate()
+            .match({date: date})
+            .lookup({from: 'courses', localField: 'course', foreignField: '_id', as: 'courseInfo'})
+            .match({'courseInfo.period': period})
+            .group({
+                _id: "$courseInfo.period",
+                attendance: {
+                    $push: "$attendance"
+                }
+            })
+            .project('-_id attendance')
+            .unwind('attendance')
+            .unwind('attendance')
+            .project({student: "$attendance.student", atsCode: '$attendance.atsCode'})
+            .lookup({from:'students', localField:'student', foreignField: '_id', as: 'studentInfo'})
+            .project({studentId: '$student', atsCode: '$atsCode', lName: '$studentInfo.lName', fName: '$studentInfo.fName'})
+            .unwind('lName')
+            .unwind('fName')
+
+    } else{
+        roster = [];
+        attendance = [];
+    }
+    
+    let data = {activeCourses: sortedCourses, roster: roster, attendance: attendance}
+
+    res.render('pages/addAttendanceSelect', {data: data, message: "", params: req.query});
 }
 
-exports.post_addNew = (req, res)=>{
+exports.post_addNew = async (req, res)=>{
     console.log("Triggered function attendance_addNew");
 
+    if(!req.user){res.redirect('/auth/login')}
+    
     const userInput = req.body;
-
-    let entryObj = {};
-    entryObj["staff"] = req.user._id;
-    entryObj["class"] = userInput.course;
-    entryObj["date"] = new Date(userInput.date);
-    
-    delete userInput.course;
-    delete userInput.date;
-    
-    // console.log("Entry object");
-    // console.log(entryObj);
-    // console.log("User input post-processing");
+    // console.log("Input:");
     // console.log(userInput);
 
-    for(let student of Object.entries(userInput)){
-        entryObj["student"] = student[0];
-        entryObj["attCode"] = student[1][0];
-        let entry = new Attendance(entryObj);
-        entry.save(genericCb);
+    let staffId = req.user.staff_id;
+    let rawDate = userInput.date;
+    let entryDate = new Date(rawDate);
+    delete userInput.course;
+    delete userInput.date;
+
+    let courseId = userInput.courseId;
+    delete userInput.courseId;
+    let attendance = Object.entries(userInput);
+    let courses = {};
+    for(let i=0; i< courseId.length; i++){
+        let c = courseId[i];
+        if(!courses[c]){courses[c] = []}
+        courses[c].push({
+            student: attendance[i][0],
+            atsCode: attendance[i][1]
+        })
     }
-    res.send('Attendance entered');
+
+    // console.log(Object.entries(courses))
+
+
+    let output = []
+    for(let course of Object.entries(courses)){
+        
+        let result = await Attendance.update({
+            date: entryDate, 
+            staff: staffId, 
+            course: course[0]
+        }, {
+            date: entryDate,
+            staff: staffId,
+            course: course[0],
+            attendance: course[1]
+        }, {
+            upsert: true,
+            new: true,
+            overwrite: true
+        });
+        output.push(result);
+    }
+
+    let redirectPath = `/entries/attendance/add?date=${rawDate}&course=&period=`;
+    console.log(`date: ${rawDate}`);
+    res.redirect(redirectPath);
 };
+
+
 
 exports.attendance_update = (req,res)=>{
     res.send('Update one existing attendance entry not yet implemented');
